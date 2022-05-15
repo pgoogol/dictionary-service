@@ -1,0 +1,23 @@
+com:
+  pgoogol:
+    searchservice:
+      criteria-config:
+        file: /home/pgogol/config.json
+
+spring:
+  elasticsearch:
+    uris: ${ELK_REST_URIS:localhost:9200}
+    username: ${ELK_USERNAME:}
+    password: ${ELK_PASSWORD:}
+    ssl_enabled: ${ELK_SSL_ENABLED:false}
+
+
+logging:
+  file:
+    name: /tmp/logstash/log.log
+  level:
+    com:
+      pgoogol:
+        search-service: ${LOG_LEVEL_ROOT:DEBUG}
+server:
+  port: 8083
