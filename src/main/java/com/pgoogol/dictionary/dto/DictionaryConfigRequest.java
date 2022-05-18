@@ -1,4 +1,4 @@
-package com.pgoogol.dictionary.model;
+package com.pgoogol.dictionary.dto;
 
 import com.pgoogol.dictionary.annotation.DictionaryExist;
 import lombok.Getter;
@@ -9,18 +9,18 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class DictionaryConfig {
+@DictionaryExist
+public class DictionaryConfigRequest {
 
     @NotNull
     private String code;
 
-    private String indexName;
+    @NotNull
+    private String name;
+
+    private String description;
 
     @NotNull
     private boolean isActive;
-
-    /*private SearchConfig searchConfig;*/
-
-    /*private ModelDictionary modelDictionary;*/
 
 }

@@ -12,7 +12,9 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
         this.client = client;
     }
 
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     @Override
     public <T> HitsMetadata<T> getAll(String indexName, Class<T> clazz) {
         SearchRequest request = new SearchRequest.Builder().index(indexName).build();
@@ -35,7 +37,7 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
         return search.hits();
     }
 
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     @Override
     public <T> Optional<T> getById(String indexName, String id, @NotNull List<String> fields) {
         SearchRequest.Builder query = new SearchRequest
@@ -62,7 +64,7 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
         }
     }
 
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     @Override
     public <T> T save(String indexName, String id, T document) {
         client.create(builder -> builder
@@ -73,7 +75,7 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
         return document;
     }
 
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     @Override
     public <T> T update(String indexName, String id, T document) {
         UpdateResponse<T> update = (UpdateResponse<T>) client.update(

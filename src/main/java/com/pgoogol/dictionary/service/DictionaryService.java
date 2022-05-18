@@ -1,17 +1,21 @@
 package com.pgoogol.dictionary.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.pgoogol.dictionary.model.DictionaryConfig;
 import com.pgoogol.dictionary.model.IndexDocument;
 import com.pgoogol.dictionary.repository.ElasticsearchRepository;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +31,7 @@ public class DictionaryService {
         this.client = client;
     }
 
-    private String getIndexName(String dictionaryCode) throws IOException {
+   /* private String getIndexName(String dictionaryCode) throws IOException {
         SearchResponse<DictionaryConfig> search = client.search(searchBuilder -> searchBuilder
                 .index("addresses_version_read")
                 .fields(builder -> builder.field("indexName"))
@@ -38,7 +42,7 @@ public class DictionaryService {
                 )), DictionaryConfig.class
         );
         return search.hits().hits().get(0).source() != null ? search.hits().hits().get(0).source().getIndexName() : null;
-    }
+    }*/
 
     public List<Object> getAll(String dictionaryCode) {
         Optional<String> indexName = repository.getById("", dictionaryCode, "indexName");
@@ -54,7 +58,7 @@ public class DictionaryService {
     public String getByCode(String dictionaryCode, String code) {
         Optional<String> indexName = repository.getById("", dictionaryCode, "indexName");
         if (indexName.isPresent()) {
-            Optional<String> byId = repository.getById((String) indexName.get(), code);
+            Optional<String> byId = repository.getById(indexName.get(), code);
             if (byId.isPresent()) {
                 return byId.get();
             } else {
@@ -66,10 +70,17 @@ public class DictionaryService {
     }
 
     @SneakyThrows
-    public String create(String dictionaryCode, IndexDocument document) {
-        Optional<String> indexName = repository.getById("", dictionaryCode, "indexName");
+    public Object create(String dictionaryCode, IndexDocument document) {
+        Optional<Map> indexName = repository.getById("dictionary-config", dictionaryCode, "indexName");
         if (indexName.isPresent()) {
-            String save = repository.save((String) indexName.get(), document.getId(), document.getDocument().toString());
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode dataNode = mapper.readValue(mapper.writeValueAsString(document.getDocument()), JsonNode.class);
+            JsonSchema jsonSchema= JsonSchemaFactory.byDefault().getJsonSchema(schemaNode);
+
+            ProcessingReport validationReport=jsonSchema.validate(dataNode);
+
+
+            Object save = repository.save((String) indexName.get().get("indexName"), document.getId(), document.getDocument());
             return save;
         } else {
             throw new NoSuchElementException();
