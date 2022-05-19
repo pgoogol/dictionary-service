@@ -1,0 +1,147 @@
+GET http://localhost:8083/manage/dictionary/name
+Accept: application/json
+
+###
+POST http://localhost:8083/manage/dictionary
+Content-Type: application/json
+
+{
+  "code": "test1",
+  "name": "asda",
+  "isActive": true,
+  "modelDictionary": [
+    {
+      "field": "code",
+      "fieldType":"string",
+      "label": "kod",
+      "required":true,
+      "items": null,
+      "properties": null
+    },
+    {
+      "field": "value",
+      "fieldType":"array",
+      "label": null,
+      "required":true,
+      "items": [
+        {
+          "field": "lang",
+          "fieldType":"string",
+          "label": "kod kraju",
+          "required":true,
+          "items": null,
+          "properties": null
+        },
+        {
+          "field": "value",
+          "fieldType":"string",
+          "label": "wartość",
+          "required":true,
+          "items": null,
+          "properties": null
+        }
+      ],
+      "properties": null
+    }
+  ]
+}
+
+<> 2022-05-19T212158.200.json
+<> 2022-05-19T211612.200.json
+<> 2022-05-19T211551.500.json
+
+
+
+###
+POST http://localhost:8083/dictionary/test1
+Content-Type: application/json
+
+{
+  "id": "PL",
+  "document": {
+    "code": "PL",
+    "value": [
+      {
+        "lang": "pl",
+        "value": "POLSKA"
+      },
+      {
+        "lang": "en",
+        "value": "POLAND"
+      }
+    ]
+  }
+}
+
+<> 2022-05-19T214800.500.json
+<> 2022-05-19T214625.500.json
+<> 2022-05-19T214421.500.json
+<> 2022-05-19T213311.500.json
+<> 2022-05-19T212735.500.json
+<> 2022-05-19T212651.500.json
+<> 2022-05-19T212506.500.json
+<> 2022-05-19T212352.500.json
+<> 2022-05-19T212228.500.json
+<> 2022-05-19T175704.500.json
+<> 2022-05-19T175654.500.json
+<> 2022-05-19T174618.500.json
+<> 2022-05-19T174521.500.json
+<> 2022-05-19T174512.500.json
+<> 2022-05-19T174437.500.json
+<> 2022-05-19T173422.500.json
+<> 2022-05-19T173345.500.json
+<> 2022-05-19T170840.500.json
+<> 2022-05-19T170046.500.json
+<> 2022-05-16T223919.500.json
+<> 2022-05-16T223551.500.json
+<> 2022-05-16T223329.500.json
+<> 2022-05-16T223306.500.json
+<> 2022-05-16T223045.500.json
+<> 2022-05-16T223016.500.json
+
+
+{
+    "code" : {
+      "type" : "string"
+    },
+    "value" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "lang" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+
+
+ObjectMapper mapper = new ObjectMapper();
+JsonNode jsonNode = mapper.readTree(mapper.writeValueAsString(document.getDocument()));
+String s = "{\"code\" : {\"type\" : \"string\"},\"value\" : {\"type\" : \"array\",\"items\" : {\"type\" : \"object\",\"properties\" : {\"value\" : {\"type\" : \"string\"},\"lang\" : {\"type\" : \"string\"}}}}}";
+JsonNode jsonNode1 = mapper.readTree(s);
+
+
+
+
+String aContent = "{\"id\": \"PL\",\"document\": {\"code\": \"PL\",\"value\": [{\"lang\": \"pl\",\"value\": \"POLSKA\"},{\"lang\": \"en\",\"value\": \"POLAND\"}]}}";
+
+String schema = "{\"type\": \"object\",\"properties\": {\"code\": {\"type\": \"string\"},\"value\": {\"type\": \"array\",\"items\": {\"lang\": {\"type\": \"string\"},\"value\": {\"type\": \"string\"}}}}}";
+String schema = "{	\"$schema\": \"http://json-schema.org/draft-04/schema#\",	\"type\": \"object\",	\"properties\": {		\"type\": {			\"type\": \"string\"		},		\"properties\": {			\"type\": \"object\",			\"properties\": {				\"code\": {					\"type\": \"object\",					\"properties\": {						\"type\": {							\"type\": \"string\"						}					},					\"required\": [						\"type\"					]				},				\"value\": {					\"type\": \"object\",					\"properties\": {						\"type\": {							\"type\": \"string\"						},						\"items\": {							\"type\": \"object\",							\"properties\": {								\"lang\": {									\"type\": \"object\",									\"properties\": {										\"type\": {											\"type\": \"string\"										}									},									\"required\": [										\"type\"									]								},								\"value\": {									\"type\": \"object\",									\"properties\": {										\"type\": {											\"type\": \"string\"										}									},									\"required\": [										\"type\"									]								}							},							\"required\": [								\"lang\",								\"value\"							]						}					},					\"required\": [						\"type\",						\"items\"					]				}			},			\"required\": [				\"code\",				\"value\"			]		}	},	\"required\": [		\"type\",		\"properties\"]}";
+
+ObjectMapper mapper=new ObjectMapper();
+
+JsonNode dataNode=mapper.readValue(mapper.writeValueAsString(aContent), JsonNode.class);
+JsonNode schemaNode=mapper.readValue(mapper.writeValueAsString(schema), JsonNode.class);
+
+JsonSchema jsonSchema=JsonSchemaFactory.byDefault().getJsonSchema(schemaNode);
+
+ProcessingReport validationReport=jsonSchema.validate(dataNode);
+
+
+
