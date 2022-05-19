@@ -25,7 +25,7 @@ public class ManageDictionaryService {
     }
 
     public DictionaryConfig getByDictionaryCode(String dictionaryCode) {
-        Optional<DictionaryConfig> byId = repository.getById("dictionary-config", dictionaryCode);
+        Optional<DictionaryConfig> byId = repository.getById("dictionary-config", dictionaryCode, DictionaryConfig.class);
         if (byId.isPresent()) {
             return byId.get();
         } else {
@@ -50,7 +50,7 @@ public class ManageDictionaryService {
 
     public DictionaryConfig updateDictionary(DictionaryConfigRequest request) {
         String code = request.getCode();
-        Optional<DictionaryConfig> byId = repository.getById("dictionary-config", code);
+        Optional<DictionaryConfig> byId = repository.getById("dictionary-config", code, DictionaryConfig.class);
         if (byId.isPresent()) {
             DictionaryConfig dictionaryConfig = byId.get();
             mapper.map(dictionaryConfig, request);

@@ -14,7 +14,6 @@ public class SearchConfig {
     public static final ListType FILTER = ListType.FILTER;
     public static final Query.Kind WILDCARD = Query.Kind.Wildcard;
 
-
     @NotBlank
     private String field;
 

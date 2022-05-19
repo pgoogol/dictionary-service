@@ -1,11 +1,14 @@
 package com.pgoogol.dictionary.dto;
 
 import com.pgoogol.dictionary.annotation.DictionaryExist;
+import com.pgoogol.dictionary.model.ModelDictionary;
+import com.pgoogol.dictionary.model.SearchConfig;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,5 +25,9 @@ public class DictionaryConfigRequest {
 
     @NotNull
     private boolean isActive;
+
+    private SearchConfig searchConfig;
+
+    private List<ModelDictionary> modelDictionary;
 
 }

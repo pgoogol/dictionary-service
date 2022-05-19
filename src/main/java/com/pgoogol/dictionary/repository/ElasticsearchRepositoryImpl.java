@@ -8,13 +8,10 @@ import co.elastic.clients.elasticsearch.core.UpdateResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import lombok.SneakyThrows;
-import org.springframework.core.GenericTypeResolver;
 import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +36,7 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
 
     @SneakyThrows(IOException.class)
     @Override
-    public <T> Optional<T> getById(String indexName, String id, @NotNull List<String> fields) {
+    public <T> Optional<T> getById(String indexName, String id, @NotNull List<String> fields, Class<T> clazz) {
         SearchRequest.Builder query = new SearchRequest
                 .Builder()
                 .index(indexName)

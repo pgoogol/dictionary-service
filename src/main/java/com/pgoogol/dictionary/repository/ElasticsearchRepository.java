@@ -12,14 +12,14 @@ public interface ElasticsearchRepository {
 
     <T> HitsMetadata<T> getAll(String indexName, Class<T> clazz);
 
-    default <T> Optional<T> getById(String indexName, String id) {
-        return getById(indexName, id, Collections.emptyList());
+    default <T> Optional<T> getById(String indexName, String id, Class<T> clazz) {
+        return getById(indexName, id, Collections.emptyList(), clazz);
     }
 
-    default <T> Optional<T> getById(String indexName, String id, @NotNull String field) {
-        return getById(indexName, id, Collections.singletonList(field));
+    default <T> Optional<T> getById(String indexName, String id, @NotNull String field, Class<T> clazz) {
+        return getById(indexName, id, Collections.singletonList(field), clazz);
     }
-    <T> Optional<T> getById(String indexName, String id, @NotNull List<String> fields);
+    <T> Optional<T> getById(String indexName, String id, @NotNull List<String> fields, Class<T> clazz);
 
     @SneakyThrows
     <T> T save(String indexName, String id, T document);
