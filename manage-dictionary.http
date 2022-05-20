@@ -1,0 +1,97 @@
+###
+GET http://localhost:8083/manage/dictionary
+Accept: application/json
+
+###
+GET http://localhost:8083/manage/dictionary/test
+Accept: application/json
+
+###
+POST http://localhost:8083/manage/dictionary
+Content-Type: application/json
+
+{
+  "code": "test",
+  "name": "asda",
+  "isActive": true,
+  "modelDictionary": [
+    {
+      "field": "code",
+      "fieldType":"string",
+      "label": "kod",
+      "required":true,
+      "items": null,
+      "properties": null
+    },
+    {
+      "field": "value",
+      "fieldType":"array",
+      "label": null,
+      "required":true,
+      "items": [
+        {
+          "field": "lang",
+          "fieldType":"string",
+          "label": "kod kraju",
+          "required":true,
+          "items": null,
+          "properties": null
+        },
+        {
+          "field": "value",
+          "fieldType":"string",
+          "label": "wartość",
+          "required":true,
+          "items": null,
+          "properties": null
+        }
+      ],
+      "properties": null
+    }
+  ]
+}
+
+###
+PUT http://localhost:8083/manage/dictionary
+Content-Type: application/json
+
+{
+  "code": "test",
+  "name": "test",
+  "isActive": false,
+  "modelDictionary": [
+    {
+      "field": "code",
+      "fieldType":"string",
+      "label": "kod",
+      "required":true,
+      "items": null,
+      "properties": null
+    },
+    {
+      "field": "value",
+      "fieldType":"array",
+      "label": null,
+      "required":true,
+      "items": [
+        {
+          "field": "lang",
+          "fieldType":"string",
+          "label": "kod kraju",
+          "required":true,
+          "items": null,
+          "properties": null
+        },
+        {
+          "field": "value",
+          "fieldType":"string",
+          "label": "wartość",
+          "required":true,
+          "items": null,
+          "properties": null
+        }
+      ],
+      "properties": null
+    }
+  ]
+}

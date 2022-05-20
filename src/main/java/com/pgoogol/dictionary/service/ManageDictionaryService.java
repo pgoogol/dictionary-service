@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class ManageDictionaryService {
 
+    private static final String DICTIONARY_CONFIG = "dictionary-config";
     private final ElasticsearchRepository repository;
     private final ManageDictionaryMapper mapper;
 
@@ -25,7 +26,7 @@ public class ManageDictionaryService {
     }
 
     public DictionaryConfig getByDictionaryCode(String dictionaryCode) {
-        Optional<DictionaryConfig> byId = repository.getById("dictionary-config", dictionaryCode, DictionaryConfig.class);
+        Optional<DictionaryConfig> byId = repository.getById(DICTIONARY_CONFIG, dictionaryCode, DictionaryConfig.class);
         if (byId.isPresent()) {
             return byId.get();
         } else {
@@ -34,7 +35,7 @@ public class ManageDictionaryService {
     }
 
     public List<DictionaryConfig> getAll() {
-        HitsMetadata<DictionaryConfig> dictionaryName = repository.getAll("dictionary-config", DictionaryConfig.class);
+        HitsMetadata<DictionaryConfig> dictionaryName = repository.getAll(DICTIONARY_CONFIG, DictionaryConfig.class);
         return dictionaryName
                 .hits()
                 .stream()
@@ -45,16 +46,16 @@ public class ManageDictionaryService {
     public DictionaryConfig createDictionary(DictionaryConfigRequest dictionaryConfig) {
         DictionaryConfig map = mapper.map(dictionaryConfig);
         map.setIndexName(dictionaryConfig.getCode() + "_dictionary");
-        return repository.save("dictionary-config", map.getCode(), map);
+        return repository.save(DICTIONARY_CONFIG, map.getCode(), map);
     }
 
     public DictionaryConfig updateDictionary(DictionaryConfigRequest request) {
         String code = request.getCode();
-        Optional<DictionaryConfig> byId = repository.getById("dictionary-config", code, DictionaryConfig.class);
+        Optional<DictionaryConfig> byId = repository.getById(DICTIONARY_CONFIG, code, DictionaryConfig.class);
         if (byId.isPresent()) {
             DictionaryConfig dictionaryConfig = byId.get();
             mapper.map(dictionaryConfig, request);
-            return repository.update("dictionary-config", code, dictionaryConfig);
+            return repository.update(DICTIONARY_CONFIG, code, dictionaryConfig);
         } else {
             throw new NoSuchElementException();
         }

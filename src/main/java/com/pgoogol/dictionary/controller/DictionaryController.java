@@ -5,6 +5,8 @@ import com.pgoogol.dictionary.service.DictionaryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/dictionary/{dictionary}")
 public class DictionaryController {
@@ -17,8 +19,8 @@ public class DictionaryController {
 
     @GetMapping
     public ResponseEntity<Object> getAll(@PathVariable(name = "dictionary") String dictionaryCode) {
-        dictionaryService.getAll(dictionaryCode);
-        return null;
+        List<Object> all = dictionaryService.getAll(dictionaryCode);
+        return ResponseEntity.ok(all);
     }
 
     @GetMapping("{code}")
@@ -26,20 +28,20 @@ public class DictionaryController {
             @PathVariable(name = "dictionary") String dictionaryCode,
             @PathVariable String code
     ) {
-        dictionaryService.getByCode(dictionaryCode, code);
-        return null;
+        Object byCode = dictionaryService.getByCode(dictionaryCode, code);
+        return ResponseEntity.ok(byCode);
     }
 
     @PostMapping
     public ResponseEntity<Object> create(@PathVariable(name = "dictionary") String dictionaryCode, @RequestBody IndexDocument document) {
-        dictionaryService.create(dictionaryCode, document);
-        return null;
+        Object o = dictionaryService.create(dictionaryCode, document);
+        return ResponseEntity.ok(o);
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@PathVariable(name = "dictionary") String dictionaryCode, IndexDocument document) {
-        dictionaryService.update(dictionaryCode, document);
-        return null;
+    public ResponseEntity<Object> update(@PathVariable(name = "dictionary") String dictionaryCode, @RequestBody IndexDocument document) {
+        Object update = dictionaryService.update(dictionaryCode, document);
+        return ResponseEntity.ok(update);
     }
 
 }

@@ -4,7 +4,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.FieldAndFormat;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.UpdateResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import lombok.SneakyThrows;
@@ -47,7 +46,7 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
                         )
                 );
         setFields(fields, query);
-        SearchResponse<T> search = (SearchResponse<T>) client.search(query.build(), Object.class);
+        SearchResponse<T> search = client.search(query.build(), clazz);
         return search.hits().hits().stream().findFirst().map(Hit::source);
     }
 
@@ -75,13 +74,13 @@ public class ElasticsearchRepositoryImpl implements ElasticsearchRepository {
     @SneakyThrows(IOException.class)
     @Override
     public <T> T update(String indexName, String id, T document) {
-        UpdateResponse<T> update = (UpdateResponse<T>) client.update(
+        client.update(
                 builder -> builder.index(indexName)
                         .id(id)
                         .doc(document),
                 Object.class
         );
-        return update.get().source();
+        return document;
 
     }
 

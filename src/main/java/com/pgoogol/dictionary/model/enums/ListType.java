@@ -5,6 +5,6 @@ public enum ListType {
     FILTER,
     MUST,
     MUST_NOT,
-    SHOULD;
+    SHOULD
 
 }

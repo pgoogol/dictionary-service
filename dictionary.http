@@ -1,0 +1,53 @@
+###
+GET http://localhost:8083/dictionary/test
+Accept: application/json
+
+###
+GET http://localhost:8083/dictionary/test/PL
+Accept: application/json
+
+###
+POST http://localhost:8083/dictionary/test
+Content-Type: application/json
+
+{
+  "id": "PL",
+  "document": {
+    "code": "PL",
+    "value": [
+      {
+        "lang": "pl",
+        "value": "POLSKA"
+      },
+      {
+        "lang": "en",
+        "value": "POLAND"
+      }
+    ]
+  }
+}
+
+###
+PUT http://localhost:8083/dictionary/test
+Content-Type: application/json
+
+{
+  "id": "PL",
+  "document": {
+    "code": "PL",
+    "value": [
+      {
+        "lang": "pl",
+        "value": "POLSKA"
+      },
+      {
+        "lang": "en",
+        "value": "POLAND"
+      },
+      {
+        "lang": "de",
+        "value": "POLEN"
+      }
+    ]
+  }
+}
