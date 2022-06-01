@@ -1,23 +1,23 @@
 ###
-GET http://localhost:8083/dictionary/test
+GET http://localhost:8083/dictionary/test1?page=0&size=100
 Accept: application/json
 
 ###
-GET http://localhost:8083/dictionary/test/PL
+GET http://localhost:8083/dictionary/test1/PL
 Accept: application/json
 
 ###
-POST http://localhost:8083/dictionary/test
+POST http://localhost:8083/dictionary/test1
 Content-Type: application/json
 
 {
-  "id": "PL",
+  "id": "EE",
   "document": {
-    "code": "PL",
+    "code": "EE",
     "value": [
       {
         "lang": "pl",
-        "value": "POLSKA"
+        "va1ue": "POLSKA"
       },
       {
         "lang": "en",
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:8083/dictionary/test
+PUT http://localhost:8083/dictionary/test1
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ Content-Type: application/json
     "value": [
       {
         "lang": "pl",
-        "value": "POLSKA"
+        "value": "POL"
       },
       {
         "lang": "en",
@@ -51,3 +51,4 @@ Content-Type: application/json
     ]
   }
 }
+

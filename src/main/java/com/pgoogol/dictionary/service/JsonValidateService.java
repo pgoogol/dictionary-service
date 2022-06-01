@@ -1,18 +1,24 @@
 package com.pgoogol.dictionary.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.pgoogol.dictionary.exception.JsonValidException;
 import com.pgoogol.dictionary.model.DictionaryConfig;
 import com.pgoogol.dictionary.model.DictionarySchema;
 import com.pgoogol.dictionary.model.DictionarySchemaItems;
 import com.pgoogol.dictionary.model.ModelDictionary;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +27,11 @@ import java.util.stream.Collectors;
 @Service
 public class JsonValidateService {
 
+    private static final Logger log = LoggerFactory.getLogger(JsonValidateService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     private static final String OBJECT = "object";
 
-    @SneakyThrows
+    @SneakyThrows({JsonProcessingException.class, ProcessingException.class, JsonValidException.class})
     public void validate(DictionaryConfig dictionaryConfig, Map<String, Object> data) {
         List<ModelDictionary> modelDictionary = dictionaryConfig.getModelDictionary();
         DictionarySchemaItems dictionarySchemaItems = DictionarySchemaItems
@@ -38,9 +45,12 @@ public class JsonValidateService {
 
         JsonSchema jsonSchema = JsonSchemaFactory.byDefault().getJsonSchema(schemaNode);
 
-        ProcessingReport validationReport = jsonSchema.validate(dataNode);
-
-        System.out.println(validationReport.toString());
+        ProcessingReport validationReport = jsonSchema.validate(dataNode, true);
+        if (!validationReport.isSuccess()) {
+            List<String> errors = new ArrayList<>();
+            validationReport.forEach(processingMessage -> errors.add(processingMessage.getMessage()));
+            throw new JsonValidException(errors);
+        }
     }
 
     private Map<String, DictionarySchema> prepareSchema(List<ModelDictionary> modelDictionary) {
@@ -50,8 +60,14 @@ public class JsonValidateService {
             builder.type(md.getFieldType());
             if (md.getItems() != null && !md.getItems().isEmpty()) {
                 Map<String, DictionarySchema> schemaMap = prepareSchema(md.getItems());
-                builder.items(DictionarySchemaItems.builder().type(OBJECT).properties(schemaMap).build());
-                builder.required(getRequiredFields(md.getItems()));
+                builder.items(
+                    DictionarySchemaItems
+                            .builder()
+                            .type(OBJECT)
+                            .properties(schemaMap)
+                            .required(getRequiredFields(md.getItems()))
+                            .build()
+                );
             } else if (md.getProperties() != null && !md.getProperties().isEmpty()) {
                 builder.properties(prepareSchema(md.getProperties()));
                 builder.required(getRequiredFields(md.getProperties()));

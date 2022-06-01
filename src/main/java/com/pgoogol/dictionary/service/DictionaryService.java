@@ -1,17 +1,26 @@
 package com.pgoogol.dictionary.service;
 
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
-import com.pgoogol.dictionary.model.*;
+import com.pgoogol.dictionary.dto.ResultPage;
+import com.pgoogol.dictionary.exception.ResourceAlreadyExistsException;
+import com.pgoogol.dictionary.exception.ResourceNotFoundException;
+import com.pgoogol.dictionary.mapper.MapDictionaryMapper;
+import com.pgoogol.dictionary.mapper.UpdateResopnse;
+import com.pgoogol.dictionary.model.DictionaryConfig;
+import com.pgoogol.dictionary.model.IndexDocument;
 import com.pgoogol.dictionary.repository.ElasticsearchRepository;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class DictionaryService {
+public class DictionaryService extends AbstractElasticsearchService {
+
+    private static final Logger log = LoggerFactory.getLogger(DictionaryService.class);
 
     private final ElasticsearchRepository repository;
     private final JsonValidateService jsonValidate;
@@ -21,52 +30,85 @@ public class DictionaryService {
         this.jsonValidate = jsonValidate;
     }
 
-    public List<Object> getAll(String dictionaryCode) {
-        Optional<DictionaryConfig> dictionaryConfig = repository.getById("", dictionaryCode, DictionaryConfig.class);
-        if (dictionaryConfig.isPresent()) {
-            HitsMetadata<Object> all = repository.getAll(dictionaryConfig.get().getIndexName(), Object.class);
-            return all.hits().stream().map(Hit::source).collect(Collectors.toList());
-        } else {
-            throw new NoSuchElementException();
-        }
+    @Override
+    protected ElasticsearchRepository getElasticsearchRepository() {
+        return repository;
+    }
+
+    public ResultPage<Object> getAll(String dictionaryCode, PageRequest pageRequest) {
+        String indexName = getIndexName(dictionaryCode);
+        HitsMetadata<Object> all = repository.getAll(indexName, pageRequest, Object.class);
+        log.info(String.valueOf(all.total().value()));
+        return ResultPage
+                .builder()
+                .page(pageRequest.getPageNumber())
+                .size(all.hits().size())
+                .totalElements(all.total() != null ? all.total().value() : 0)
+                .totalPages((int) Math.ceil((double) all.total().value() / pageRequest.getPageSize()))
+                .data(getSource(all))
+                .build();
     }
 
     @SneakyThrows
     public Object getByCode(String dictionaryCode, String code) {
-        Optional<DictionaryConfig> dictionaryConfig = repository.getById("", dictionaryCode, DictionaryConfig.class);
-        if (dictionaryConfig.isPresent()) {
-            Optional<Object> byId = repository.getById(dictionaryConfig.get().getIndexName(), code, Object.class);
-            if (byId.isPresent()) {
-                return byId.get();
-            } else {
-                throw new NoSuchElementException();
-            }
+        String indexName = getIndexName(dictionaryCode);
+        Optional<Object> byId = repository.getById(indexName, code, Object.class);
+        if (byId.isPresent()) {
+            return byId.get();
         } else {
-            throw new NoSuchElementException();
+            throw new ResourceNotFoundException(String.format("Not found element with code %s", dictionaryCode));
         }
     }
 
     @SneakyThrows
     public Object create(String dictionaryCode, IndexDocument document) {
-        Optional<DictionaryConfig> dictionaryConfigOptional = repository.getById("dictionary-config", dictionaryCode, DictionaryConfig.class);
+        Optional<DictionaryConfig> dictionaryConfigOptional =
+                getDictionaryConfig(dictionaryCode, Arrays.asList("indexName", "modelDictionary"));
         if (dictionaryConfigOptional.isPresent()) {
             DictionaryConfig dictionaryConfig = dictionaryConfigOptional.get();
-            jsonValidate.validate(dictionaryConfig, document.getDocument());
-            return repository.save(dictionaryConfig.getIndexName(), document.getId(), document.getDocument());
+            if (isExistsById(dictionaryConfig.getIndexName(), document.getId())) {
+                throw new ResourceAlreadyExistsException(String.format("Dictionary with code %s exist", dictionaryCode));
+            }
+            return validAndSave(dictionaryConfig, document, dictionaryConfig.getIndexName());
         } else {
-            throw new NoSuchElementException();
+            throw new ResourceNotFoundException(String.format("Not found element with code %s", dictionaryCode));
         }
     }
 
     @SneakyThrows
-    public Object update(String dictionaryCode, IndexDocument document) {
-        Optional<DictionaryConfig> dictionaryConfigOptional = repository.getById("", dictionaryCode, "indexName", DictionaryConfig.class);
+    public UpdateResopnse<Object> update(String dictionaryCode, IndexDocument document) {
+        Optional<DictionaryConfig> dictionaryConfigOptional =
+                getDictionaryConfig(dictionaryCode, Arrays.asList("indexName", "modelDictionary"));
         if (dictionaryConfigOptional.isPresent()) {
             DictionaryConfig dictionaryConfig = dictionaryConfigOptional.get();
-            jsonValidate.validate(dictionaryConfig, document.getDocument());
-            return repository.update(dictionaryConfig.getIndexName(), document.getId(), document.getDocument());
+            String indexName = dictionaryConfig.getIndexName();
+            Optional<Map<String, Object>> byId = getById(indexName, document.getId());
+            if (byId.isPresent()) {
+                return UpdateResopnse.builder()
+                        .value(validAndUpadte(document, dictionaryConfig, indexName, byId.get()))
+                        .update(true)
+                        .build();
+            } else {
+                return UpdateResopnse.builder()
+                        .value(validAndSave(dictionaryConfig, document, indexName))
+                        .update(false)
+                        .build();
+            }
         } else {
-            throw new NoSuchElementException();
+            throw new ResourceNotFoundException(String.format("Not found element with code %s", dictionaryCode));
         }
+    }
+
+    private Map<String, Object> validAndSave(DictionaryConfig dictionaryConfig, IndexDocument document,
+                                             String indexName) {
+        jsonValidate.validate(dictionaryConfig, document.getDocument());
+        return repository.save(indexName, document.getId(), document.getDocument());
+    }
+
+    private Map<String, Object> validAndUpadte(IndexDocument document, DictionaryConfig dictionaryConfig,
+                                               String indexName, Map<String, Object> target) {
+        MapDictionaryMapper.map(document.getDocument(), target, "code");
+        jsonValidate.validate(dictionaryConfig, document.getDocument());
+        return repository.update(indexName, document.getId(), document.getDocument());
     }
 }
