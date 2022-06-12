@@ -2,7 +2,7 @@ package com.pgoogol.dictionary.annotation;
 
 import com.pgoogol.dictionary.dto.DictionaryConfigRequest;
 import com.pgoogol.dictionary.exception.ResourceAlreadyExistsException;
-import com.pgoogol.dictionary.repository.ElasticsearchRepository;
+import com.pgoogol.elasticsearch.data.repository.ElasticsearchRepository;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

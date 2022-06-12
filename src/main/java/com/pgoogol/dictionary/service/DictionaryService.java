@@ -8,7 +8,7 @@ import com.pgoogol.dictionary.mapper.MapDictionaryMapper;
 import com.pgoogol.dictionary.mapper.UpdateResopnse;
 import com.pgoogol.dictionary.model.DictionaryConfig;
 import com.pgoogol.dictionary.model.IndexDocument;
-import com.pgoogol.dictionary.repository.ElasticsearchRepository;
+import com.pgoogol.elasticsearch.data.repository.ElasticsearchRepository;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

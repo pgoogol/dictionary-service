@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import com.pgoogol.dictionary.exception.ResourceNotFoundException;
 import com.pgoogol.dictionary.model.DictionaryConfig;
-import com.pgoogol.dictionary.repository.ElasticsearchRepository;
+import com.pgoogol.elasticsearch.data.repository.ElasticsearchRepository;
 
 import java.util.List;
 import java.util.Map;

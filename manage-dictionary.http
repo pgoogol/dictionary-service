@@ -11,8 +11,8 @@ POST http://localhost:8083/manage/dictionary
 Content-Type: application/json
 
 {
-  "code": "test2",
-  "name": "asda",
+  "code": "test4",
+  "name": "aaaaa",
   "isActive": true,
   "modelDictionary": [
     {
@@ -56,7 +56,7 @@ PUT http://localhost:8083/manage/dictionary
 Content-Type: application/json
 
 {
-  "code": "test",
+  "code": "test4",
   "name": "test",
   "isActive": false,
   "modelDictionary": [
@@ -92,6 +92,14 @@ Content-Type: application/json
         }
       ],
       "properties": null
+    }
+  ],
+  "searchConfig": [
+    {
+      "field": "value",
+      "indexField": "value.lang",
+      "listType": "FILTER",
+      "queryKind": "Wildcard"
     }
   ]
 }

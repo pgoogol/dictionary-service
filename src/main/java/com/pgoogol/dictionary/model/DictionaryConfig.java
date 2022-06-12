@@ -18,7 +18,7 @@ public class DictionaryConfig {
     @NotNull
     private boolean isActive;
 
-    private SearchConfig searchConfig;
+    private List<SearchConfig> searchConfig;
 
     private List<ModelDictionary> modelDictionary;
 

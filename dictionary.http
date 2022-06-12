@@ -7,7 +7,7 @@ GET http://localhost:8083/dictionary/test1/PL
 Accept: application/json
 
 ###
-POST http://localhost:8083/dictionary/test1
+POST http://localhost:8083/dictionary/test4
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
     "value": [
       {
         "lang": "pl",
-        "va1ue": "POLSKA"
+        "value": "POLSKA"
       },
       {
         "lang": "en",

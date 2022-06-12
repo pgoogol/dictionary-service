@@ -23,7 +23,6 @@ public class DictionaryConfigRequest {
 
     @Schema(description = "Dictionary Name")
     @NotBlank
-    @Min(3)
     private String name;
 
     @Schema(description = "Dictionary Description")

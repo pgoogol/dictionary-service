@@ -15,6 +15,8 @@
     <description>dictionary-service</description>
     <properties>
         <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <lombok.version>1.18.20</lombok.version>
         <platform.encoding>UTF-8</platform.encoding>
         <mapstruct.version>1.5.0.Beta1</mapstruct.version>
@@ -22,19 +24,15 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>com.pgoogol</groupId>
+            <artifactId>elasticsearch-data</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>co.elastic.clients</groupId>
-            <artifactId>elasticsearch-java</artifactId>
-            <version>8.2.0</version>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -45,7 +43,6 @@
             <artifactId>jakarta.json-api</artifactId>
             <version>2.0.1</version>
         </dependency>
-
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
