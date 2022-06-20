@@ -8,6 +8,7 @@ import com.pgoogol.dictionary.mapper.MapDictionaryMapper;
 import com.pgoogol.dictionary.mapper.UpdateResopnse;
 import com.pgoogol.dictionary.model.DictionaryConfig;
 import com.pgoogol.dictionary.model.IndexDocument;
+import com.pgoogol.dictionary.model.ModelDictionary;
 import com.pgoogol.elasticsearch.data.repository.ElasticsearchRepository;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -69,7 +70,7 @@ public class DictionaryService extends AbstractElasticsearchService {
             if (isExistsById(dictionaryConfig.getIndexName(), document.getId())) {
                 throw new ResourceAlreadyExistsException(String.format("Dictionary with code %s exist", dictionaryCode));
             }
-            return validAndSave(dictionaryConfig, document, dictionaryConfig.getIndexName());
+            return validAndSave(dictionaryConfig.getModelDictionary(), document, dictionaryConfig.getIndexName());
         } else {
             throw new ResourceNotFoundException(String.format("Not found element with code %s", dictionaryCode));
         }
@@ -82,15 +83,16 @@ public class DictionaryService extends AbstractElasticsearchService {
         if (dictionaryConfigOptional.isPresent()) {
             DictionaryConfig dictionaryConfig = dictionaryConfigOptional.get();
             String indexName = dictionaryConfig.getIndexName();
+            List<ModelDictionary> modelDictionary = dictionaryConfig.getModelDictionary();
             Optional<Map<String, Object>> byId = getById(indexName, document.getId());
             if (byId.isPresent()) {
                 return UpdateResopnse.builder()
-                        .value(validAndUpadte(document, dictionaryConfig, indexName, byId.get()))
+                        .value(validAndUpadte(document, modelDictionary, indexName, byId.get()))
                         .update(true)
                         .build();
             } else {
                 return UpdateResopnse.builder()
-                        .value(validAndSave(dictionaryConfig, document, indexName))
+                        .value(validAndSave(modelDictionary, document, indexName))
                         .update(false)
                         .build();
             }
@@ -99,16 +101,16 @@ public class DictionaryService extends AbstractElasticsearchService {
         }
     }
 
-    private Map<String, Object> validAndSave(DictionaryConfig dictionaryConfig, IndexDocument document,
+    private Map<String, Object> validAndSave(List<ModelDictionary> modelDictionary, IndexDocument document,
                                              String indexName) {
-        jsonValidate.validate(dictionaryConfig, document.getDocument());
+        jsonValidate.validate(modelDictionary, document.getDocument());
         return repository.save(indexName, document.getId(), document.getDocument());
     }
 
-    private Map<String, Object> validAndUpadte(IndexDocument document, DictionaryConfig dictionaryConfig,
+    private Map<String, Object> validAndUpadte(IndexDocument document, List<ModelDictionary> modelDictionary,
                                                String indexName, Map<String, Object> target) {
         MapDictionaryMapper.map(document.getDocument(), target, "code");
-        jsonValidate.validate(dictionaryConfig, document.getDocument());
+        jsonValidate.validate(modelDictionary, document.getDocument());
         return repository.update(indexName, document.getId(), document.getDocument());
     }
 }

@@ -31,9 +31,18 @@ public class JsonValidateService {
     private static final ObjectMapper MAPPER = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     private static final String OBJECT = "object";
 
-    @SneakyThrows({JsonProcessingException.class, ProcessingException.class, JsonValidException.class})
-    public void validate(DictionaryConfig dictionaryConfig, Map<String, Object> data) {
-        List<ModelDictionary> modelDictionary = dictionaryConfig.getModelDictionary();
+    @SneakyThrows({JsonValidException.class})
+    public void validate(List<ModelDictionary> modelDictionary, Map<String, Object> data) {
+        ProcessingReport validationReport = validateJson(modelDictionary, data);
+        if (!validationReport.isSuccess()) {
+            List<String> errors = new ArrayList<>();
+            validationReport.forEach(processingMessage -> errors.add(processingMessage.getMessage()));
+            throw new JsonValidException(errors);
+        }
+    }
+
+    @SneakyThrows({JsonProcessingException.class, ProcessingException.class})
+    public ProcessingReport validateJson(List<ModelDictionary> modelDictionary, Map<String, Object> data) {
         DictionarySchemaItems dictionarySchemaItems = DictionarySchemaItems
                 .builder()
                 .type(OBJECT)
@@ -46,11 +55,7 @@ public class JsonValidateService {
         JsonSchema jsonSchema = JsonSchemaFactory.byDefault().getJsonSchema(schemaNode);
 
         ProcessingReport validationReport = jsonSchema.validate(dataNode, true);
-        if (!validationReport.isSuccess()) {
-            List<String> errors = new ArrayList<>();
-            validationReport.forEach(processingMessage -> errors.add(processingMessage.getMessage()));
-            throw new JsonValidException(errors);
-        }
+        return validationReport;
     }
 
     private Map<String, DictionarySchema> prepareSchema(List<ModelDictionary> modelDictionary) {
