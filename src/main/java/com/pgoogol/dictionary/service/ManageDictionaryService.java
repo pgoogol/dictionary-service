@@ -8,14 +8,14 @@ import com.pgoogol.dictionary.exception.ResourceNotFoundException;
 import com.pgoogol.dictionary.mapper.ManageDictionaryMapper;
 import com.pgoogol.dictionary.mapper.UpdateResopnse;
 import com.pgoogol.dictionary.model.DictionaryConfig;
+import com.pgoogol.elasticsearch.data.model.IndexModel;
 import com.pgoogol.elasticsearch.data.repository.ElasticsearchIndiciesRepository;
 import com.pgoogol.elasticsearch.data.repository.ElasticsearchRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
 import java.util.Optional;
 
 @Validated
@@ -66,7 +66,8 @@ public class ManageDictionaryService extends AbstractElasticsearchService {
     public DictionaryConfig createDictionary(@DictionaryExist DictionaryConfigRequest dictionaryConfig) {
         DictionaryConfig map = mapper.map(dictionaryConfig);
         map.setIndexName(dictionaryConfig.getCode() + DICTIONARY_INDEX_NAME_SUFFIX);
-        indiciesRepository.create(map.getIndexName());
+        List<IndexModel> indexModels = mapper.mapToIndexModelList(dictionaryConfig.getModelDictionary());
+        indiciesRepository.create(map.getIndexName(), indexModels);
         return repository.save(DICTIONARY_CONFIG, map.getCode(), map);
     }
 
