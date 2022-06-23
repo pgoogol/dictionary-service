@@ -9,7 +9,6 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.pgoogol.dictionary.exception.JsonValidException;
-import com.pgoogol.dictionary.model.DictionaryConfig;
 import com.pgoogol.dictionary.model.DictionarySchema;
 import com.pgoogol.dictionary.model.DictionarySchemaItems;
 import com.pgoogol.dictionary.model.ModelDictionary;
@@ -54,8 +53,7 @@ public class JsonValidateService {
 
         JsonSchema jsonSchema = JsonSchemaFactory.byDefault().getJsonSchema(schemaNode);
 
-        ProcessingReport validationReport = jsonSchema.validate(dataNode, true);
-        return validationReport;
+        return jsonSchema.validate(dataNode, true);
     }
 
     private Map<String, DictionarySchema> prepareSchema(List<ModelDictionary> modelDictionary) {

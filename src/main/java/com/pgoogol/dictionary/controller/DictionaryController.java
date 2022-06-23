@@ -104,7 +104,7 @@ public class DictionaryController {
                     description = "Successful Operation Created"
             ),
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "200",
                     description = "Successful Operation Update"
             )
     })
@@ -119,7 +119,7 @@ public class DictionaryController {
             ) @RequestBody IndexDocument document) {
         UpdateResopnse<Object> updateDictionary = dictionaryService.update(dictionaryCode, document);
         if (updateDictionary.isUpdate()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updateDictionary.getValue());
+            return ResponseEntity.status(HttpStatus.OK).body(updateDictionary.getValue());
         } else {
             return ResponseEntity.status(HttpStatus.CREATED).body(updateDictionary.getValue());
         }

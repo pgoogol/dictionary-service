@@ -16,19 +16,6 @@ spring:
     password: ${ELK_PASSWORD:}
     ssl_enabled: ${ELK_SSL_ENABLED:false}
 
-#logging:
-#  file:
-#    name: C:/log/log.log
-#    #name: /tmp/logstash/log.log
-#  pattern:
-#    #console: '%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n'
-#    console: '[%d{yyyy-MM-dd HH:mm:ss.SSS}] [${HOSTNAME}] [%thread] %level %logger{36}@%method:%line - %msg%n'
-#    #file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
-#    file: '[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} - %msg%n'
-#    file: '[%d{yyyy-MM-dd HH:mm:ss.SSS}] [${HOSTNAME}] [%thread] %level %logger{36}@%method:%line - %msg%n'
-#  level:
-#    com:
-#      pgoogol:
-#        search-service: ${LOG_LEVEL_ROOT:DEBUG}
+
 server:
   port: 8083

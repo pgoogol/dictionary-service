@@ -18,10 +18,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.pgoogol.dictionary.model.enums.Fields.INDEX_NAME;
+import static com.pgoogol.dictionary.model.enums.Fields.MODEL_DICTIONARY;
+
 @Service
 public class DictionaryService extends AbstractElasticsearchService {
 
-    private static final Logger log = LoggerFactory.getLogger(DictionaryService.class);
+    public static final String ID_NAME = "code";
 
     private final ElasticsearchRepository repository;
     private final JsonValidateService jsonValidate;
@@ -39,7 +42,6 @@ public class DictionaryService extends AbstractElasticsearchService {
     public ResultPage<Object> getAll(String dictionaryCode, PageRequest pageRequest) {
         String indexName = getIndexName(dictionaryCode);
         HitsMetadata<Object> all = repository.getAll(indexName, pageRequest, Object.class);
-        log.info(String.valueOf(all.total().value()));
         return ResultPage
                 .builder()
                 .page(pageRequest.getPageNumber())
@@ -64,7 +66,7 @@ public class DictionaryService extends AbstractElasticsearchService {
     @SneakyThrows
     public Object create(String dictionaryCode, IndexDocument document) {
         Optional<DictionaryConfig> dictionaryConfigOptional =
-                getDictionaryConfig(dictionaryCode, Arrays.asList("indexName", "modelDictionary"));
+                getDictionaryConfig(dictionaryCode, Arrays.asList(INDEX_NAME.getName(), MODEL_DICTIONARY.getName()));
         if (dictionaryConfigOptional.isPresent()) {
             DictionaryConfig dictionaryConfig = dictionaryConfigOptional.get();
             if (isExistsById(dictionaryConfig.getIndexName(), document.getId())) {
@@ -79,7 +81,7 @@ public class DictionaryService extends AbstractElasticsearchService {
     @SneakyThrows
     public UpdateResopnse<Object> update(String dictionaryCode, IndexDocument document) {
         Optional<DictionaryConfig> dictionaryConfigOptional =
-                getDictionaryConfig(dictionaryCode, Arrays.asList("indexName", "modelDictionary"));
+                getDictionaryConfig(dictionaryCode, Arrays.asList(INDEX_NAME.getName(), MODEL_DICTIONARY.getName()));
         if (dictionaryConfigOptional.isPresent()) {
             DictionaryConfig dictionaryConfig = dictionaryConfigOptional.get();
             String indexName = dictionaryConfig.getIndexName();
@@ -87,7 +89,7 @@ public class DictionaryService extends AbstractElasticsearchService {
             Optional<Map<String, Object>> byId = getById(indexName, document.getId());
             if (byId.isPresent()) {
                 return UpdateResopnse.builder()
-                        .value(validAndUpadte(document, modelDictionary, indexName, byId.get()))
+                        .value(validAndUpdate(document, modelDictionary, indexName, byId.get()))
                         .update(true)
                         .build();
             } else {
@@ -107,9 +109,9 @@ public class DictionaryService extends AbstractElasticsearchService {
         return repository.save(indexName, document.getId(), document.getDocument());
     }
 
-    private Map<String, Object> validAndUpadte(IndexDocument document, List<ModelDictionary> modelDictionary,
+    private Map<String, Object> validAndUpdate(IndexDocument document, List<ModelDictionary> modelDictionary,
                                                String indexName, Map<String, Object> target) {
-        MapDictionaryMapper.map(document.getDocument(), target, "code");
+        MapDictionaryMapper.map(document.getDocument(), target, ID_NAME);
         jsonValidate.validate(modelDictionary, document.getDocument());
         return repository.update(indexName, document.getId(), document.getDocument());
     }

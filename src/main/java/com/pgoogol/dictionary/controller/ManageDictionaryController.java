@@ -100,7 +100,7 @@ public class ManageDictionaryController {
                     content = @Content(schema = @Schema(implementation = DictionaryConfig.class))
             ),
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "200",
                     description = "Successful Operation Update",
                     content = @Content(schema = @Schema(implementation = DictionaryConfig.class))
             )
@@ -113,7 +113,7 @@ public class ManageDictionaryController {
     ) {
         UpdateResopnse<DictionaryConfig> updateDictionary = manageDictionaryService.updateDictionary(request);
         if (updateDictionary.isUpdate()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updateDictionary.getValue());
+            return ResponseEntity.status(HttpStatus.OK).body(updateDictionary.getValue());
         } else {
             return ResponseEntity.status(HttpStatus.CREATED).body(updateDictionary.getValue());
         }

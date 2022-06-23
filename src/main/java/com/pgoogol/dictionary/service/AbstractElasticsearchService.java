@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.pgoogol.dictionary.model.enums.Fields.INDEX_NAME;
+
 public abstract class AbstractElasticsearchService {
 
     protected static final String DICTIONARY_CONFIG = "dictionary-config";
@@ -19,7 +21,7 @@ public abstract class AbstractElasticsearchService {
 
     protected String getIndexName(String dictionaryCode) {
         Optional<DictionaryConfig> dictionaryConfig = getElasticsearchRepository()
-                .getById(DICTIONARY_CONFIG, dictionaryCode, "indexName", DictionaryConfig.class);
+                .getById(DICTIONARY_CONFIG, dictionaryCode, INDEX_NAME.getName(), DictionaryConfig.class);
         if (dictionaryConfig.isPresent()) {
             return dictionaryConfig.get().getIndexName();
         } else {
@@ -32,6 +34,7 @@ public abstract class AbstractElasticsearchService {
                 .getById(DICTIONARY_CONFIG, dictionaryCode, filedList, DictionaryConfig.class);
     }
 
+    @SuppressWarnings("unchecked")
     protected Optional<Map<String, Object>> getById(String indexName, String dictionaryCode) {
         Class<Map<String,Object>> clazz = (Class)Map.class;
         return getElasticsearchRepository()

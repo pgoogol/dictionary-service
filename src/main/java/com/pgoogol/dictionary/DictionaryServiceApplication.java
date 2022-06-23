@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
-		"com.pgoogol.elasticsearch.data.repository",
+		"com.pgoogol.elasticsearch.data",
 		"com.pgoogol.dictionary"
 })
 @Import({
@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Import;
 })
 public class DictionaryServiceApplication {
 
-	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 		SpringApplication.run(DictionaryServiceApplication.class, args);
 	}

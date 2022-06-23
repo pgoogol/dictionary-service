@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -27,9 +26,9 @@ public class ModelDictionary {
     private boolean required;
 
     @ArraySchema(arraySchema = @Schema(description = "Array SubModel(ModelDictionary.class)", implementation = ModelDictionary.class))
-    private List<ModelDictionary> items = Collections.emptyList();
+    private List<ModelDictionary> items;
 
     @ArraySchema(arraySchema = @Schema(description = "SubModel(ModelDictionary.class)", implementation = ModelDictionary.class))
-    private List<ModelDictionary> properties = Collections.emptyList();
+    private List<ModelDictionary> properties;
 
 }
